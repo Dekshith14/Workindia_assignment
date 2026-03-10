@@ -12,8 +12,9 @@ import { AIHelper } from '@/components/AIHelper';
 import { downloadResumePdf } from '@/lib/pdf';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ArrowLeft, Download, Save, History, Layout, Sparkles, Eye, PenLine } from 'lucide-react';
+import { ArrowLeft, Download, Save, History, Layout, Sparkles, Eye, PenLine, FileText } from 'lucide-react';
 import { toast } from 'sonner';
+import { motion } from 'framer-motion';
 
 export default function Editor() {
   const { id } = useParams<{ id: string }>();
@@ -67,7 +68,6 @@ export default function Editor() {
         resume_id: id,
         data: JSON.parse(JSON.stringify(data)),
       }]);
-
       const now = new Date();
       setSavedTimestamp(`Saved ${now.toLocaleTimeString('en-US', { hour12: false })}`);
       toast.success('Resume saved');
@@ -83,16 +83,12 @@ export default function Editor() {
   const handleTemplateChange = async (t: TemplateId) => {
     if (t === 'executive' && !isPaidUnlocked) return;
     setTemplate(t);
-    if (id) {
-      await supabase.from('resumes').update({ template: t }).eq('id', id);
-    }
+    if (id) await supabase.from('resumes').update({ template: t }).eq('id', id);
   };
 
   const handleUnlockPaid = async () => {
     setIsPaidUnlocked(true);
-    if (id) {
-      await supabase.from('resumes').update({ is_paid_template_unlocked: true }).eq('id', id);
-    }
+    if (id) await supabase.from('resumes').update({ is_paid_template_unlocked: true }).eq('id', id);
     toast.success('Executive template unlocked!');
   };
 
@@ -105,7 +101,10 @@ export default function Editor() {
   if (!resume) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
-        <p className="text-muted-foreground text-sm">Loading...</p>
+        <div className="flex items-center gap-3">
+          <div className="h-5 w-5 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+          <p className="text-muted-foreground text-sm">Loading editor...</p>
+        </div>
       </div>
     );
   }
@@ -113,33 +112,39 @@ export default function Editor() {
   return (
     <div className="flex flex-col h-screen bg-background">
       {/* Toolbar */}
-      <header className="border-b border-border px-4 py-2 flex items-center gap-2 shrink-0">
+      <header className="border-b border-border px-4 py-2 flex items-center gap-2 shrink-0 glass">
         <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard')}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
+        <div className="h-6 w-6 rounded-md bg-primary/10 flex items-center justify-center">
+          <FileText className="h-3.5 w-3.5 text-primary" />
+        </div>
         <Input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           className="max-w-[200px] h-8 text-sm font-medium border-none bg-transparent focus-visible:ring-1"
         />
         <div className="flex-1" />
-        <Button variant="ghost" size="sm" onClick={() => setShowAI(true)}>
+        {savedTimestamp && (
+          <span className="text-xs text-muted-foreground animate-save-fade mr-2">{savedTimestamp}</span>
+        )}
+        <Button variant="ghost" size="sm" onClick={() => setShowAI(true)} className="text-accent hover:text-accent">
           <Sparkles className="mr-1.5 h-4 w-4" />
-          AI Assist
+          <span className="hidden sm:inline">AI Assist</span>
         </Button>
         <Button variant="ghost" size="sm" onClick={() => setShowTemplates(true)}>
           <Layout className="mr-1.5 h-4 w-4" />
-          Templates
+          <span className="hidden sm:inline">Templates</span>
         </Button>
         <Button variant="ghost" size="sm" onClick={() => setShowVersions(true)}>
           <History className="mr-1.5 h-4 w-4" />
-          Version History
+          <span className="hidden sm:inline">History</span>
         </Button>
         <Button variant="ghost" size="sm" onClick={() => downloadResumePdf('resume-preview', title || 'resume')}>
           <Download className="mr-1.5 h-4 w-4" />
-          Download
+          <span className="hidden sm:inline">PDF</span>
         </Button>
-        <Button size="sm" onClick={handleSave} disabled={saving}>
+        <Button size="sm" onClick={handleSave} disabled={saving} className="glow-primary">
           <Save className="mr-1.5 h-4 w-4" />
           {saving ? 'Saving...' : 'Save'}
         </Button>
@@ -149,14 +154,14 @@ export default function Editor() {
       <div className="md:hidden flex border-b border-border">
         <button
           onClick={() => setMobileView('editor')}
-          className={`flex-1 py-2 text-sm font-medium text-center transition-colors ${mobileView === 'editor' ? 'text-foreground bg-secondary' : 'text-muted-foreground'}`}
+          className={`flex-1 py-2.5 text-sm font-medium text-center transition-colors ${mobileView === 'editor' ? 'text-primary bg-primary/5' : 'text-muted-foreground'}`}
         >
           <PenLine className="inline h-4 w-4 mr-1" />
           Editor
         </button>
         <button
           onClick={() => setMobileView('preview')}
-          className={`flex-1 py-2 text-sm font-medium text-center transition-colors ${mobileView === 'preview' ? 'text-foreground bg-secondary' : 'text-muted-foreground'}`}
+          className={`flex-1 py-2.5 text-sm font-medium text-center transition-colors ${mobileView === 'preview' ? 'text-primary bg-primary/5' : 'text-muted-foreground'}`}
         >
           <Eye className="inline h-4 w-4 mr-1" />
           Preview
@@ -166,44 +171,23 @@ export default function Editor() {
       {/* Split view */}
       <div className="flex-1 flex overflow-hidden">
         <div
-          className={`w-full md:w-1/2 overflow-y-auto bg-secondary border-r border-border transition-opacity duration-700 ${editorDimmed ? 'opacity-50' : 'opacity-100'} ${mobileView === 'preview' ? 'hidden md:block' : ''}`}
+          className={`w-full md:w-1/2 overflow-y-auto bg-card border-r border-border transition-opacity duration-700 ${editorDimmed ? 'opacity-50' : 'opacity-100'} ${mobileView === 'preview' ? 'hidden md:block' : ''}`}
         >
           <ResumeForm data={data} onChange={setData} />
         </div>
-        <div className={`w-full md:w-1/2 overflow-y-auto bg-background relative ${mobileView === 'editor' ? 'hidden md:block' : ''}`}>
-          {savedTimestamp && (
-            <div className="absolute top-3 left-1/2 -translate-x-1/2 z-10 text-xs font-medium text-muted-foreground animate-save-fade">
-              {savedTimestamp}
-            </div>
-          )}
+        <div className={`w-full md:w-1/2 overflow-y-auto bg-secondary/30 relative ${mobileView === 'editor' ? 'hidden md:block' : ''}`}>
           <ResumePreview data={data} template={template} />
         </div>
       </div>
 
       {showVersions && id && (
-        <VersionHistoryModal
-          resumeId={id}
-          onRestore={handleRestoreVersion}
-          onClose={() => setShowVersions(false)}
-        />
+        <VersionHistoryModal resumeId={id} onRestore={handleRestoreVersion} onClose={() => setShowVersions(false)} />
       )}
-
       {showTemplates && (
-        <TemplateSelector
-          current={template}
-          isPaidUnlocked={isPaidUnlocked}
-          onSelect={handleTemplateChange}
-          onUnlock={handleUnlockPaid}
-          onClose={() => setShowTemplates(false)}
-        />
+        <TemplateSelector current={template} isPaidUnlocked={isPaidUnlocked} onSelect={handleTemplateChange} onUnlock={handleUnlockPaid} onClose={() => setShowTemplates(false)} />
       )}
-
       {showAI && (
-        <AIHelper
-          data={data}
-          onChange={setData}
-          onClose={() => setShowAI(false)}
-        />
+        <AIHelper data={data} onChange={setData} onClose={() => setShowAI(false)} />
       )}
     </div>
   );
