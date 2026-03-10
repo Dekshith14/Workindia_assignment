@@ -14,8 +14,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        interface: ['Inter', 'system-ui', 'sans-serif'],
-        resume: ['"Source Serif 4"', 'Georgia', 'serif'],
+        interface: ['DM Sans', 'system-ui', 'sans-serif'],
+        resume: ['"Playfair Display"', 'Georgia', 'serif'],
+        mono: ['"JetBrains Mono"', 'monospace'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -23,11 +24,6 @@ export default {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
-        surface: "hsl(var(--surface))",
-        canvas: "hsl(var(--canvas))",
-        ink: "hsl(var(--ink))",
-        action: "hsl(var(--action))",
-        warning: "hsl(var(--warning))",
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",

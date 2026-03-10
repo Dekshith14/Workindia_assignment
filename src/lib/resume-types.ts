@@ -38,7 +38,7 @@ export interface ResumeData {
   skills: string[];
 }
 
-export type TemplateId = 'classic' | 'modern' | 'executive';
+export type TemplateId = 'classic' | 'modern' | 'minimal' | 'creative' | 'tech' | 'executive';
 
 export interface ResumeRecord {
   id: string;
