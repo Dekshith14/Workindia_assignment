@@ -59,14 +59,14 @@ export default function Editor() {
 
     const { error } = await supabase
       .from('resumes')
-      .update({ data: data as unknown as Record<string, unknown>, title, template })
+      .update({ data: JSON.parse(JSON.stringify(data)), title, template })
       .eq('id', id);
 
     if (!error) {
-      await supabase.from('resume_versions').insert({
+      await supabase.from('resume_versions').insert([{
         resume_id: id,
-        data: data as unknown as Record<string, unknown>,
-      });
+        data: JSON.parse(JSON.stringify(data)),
+      }]);
 
       const now = new Date();
       setSavedTimestamp(`Saved ${now.toLocaleTimeString('en-US', { hour12: false })}`);

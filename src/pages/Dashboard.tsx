@@ -30,7 +30,7 @@ export default function Dashboard() {
     if (!user) return;
     const { data, error } = await supabase
       .from('resumes')
-      .insert({ user_id: user.id, title: 'Untitled Resume', template: 'classic', data: emptyResumeData as unknown as Record<string, unknown> })
+      .insert([{ user_id: user.id, title: 'Untitled Resume', template: 'classic', data: JSON.parse(JSON.stringify(emptyResumeData)) }])
       .select()
       .single();
     if (!error && data) {
