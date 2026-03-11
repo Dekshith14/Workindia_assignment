@@ -9,7 +9,7 @@
 ResumeForge is a full-stack application designed to help professionals craft standout resumes with ease. Featuring AI-powered suggestions, real-time preview, and multiple professional templates.
 
 ## 🌐 Live Demo : 
-       https://workindia-assignment-resume-forge.vercel.app/
+https://workindia-assignment-resume-forge.vercel.app/
 
 ## 📸 Screenshots
 
