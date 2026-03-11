@@ -1,35 +1,33 @@
 # ResumeForge – Professional AI Resume Builder
 
-ResumeForge is a full-stack application designed to help professionals craft standout resumes with ease. Featuring AI-powered suggestions, real-time preview, and multiple professional templates.
+ResumeForge is a full-stack application designed to help professionals craft standout resumes with ease. Version 2.0 features a premium design system, AI-powered suggestions, real-time preview, and multiple professional templates.
 
 ## 🚀 Features
 
-- **Split-Screen Editor**: Real-time preview as you type your resume details.
-- **AI-Powered Assistance**: Generate professional summaries, improve bullet points, and suggest relevant skills using AI.
-- **Multiple Templates**: Choose from Classic, Modern, Minimal, Creative, Tech, and Executive styles.
-- **Version History**: Automatic snapshot save on every update, with one-click restore.
-- **PDF Export**: Pixel-perfect PDF generation preserving template layouts.
-- **Cloud Sync**: Securely store and manage multiple resumes.
+- **AI-Powered Assistance**: Generate professional summaries, improve experience bullet points with action-verbs, and get skill suggestions based on your target role.
+- **Resume Import (PDF/DOCX)**: Intelligent parser that extracts personal info, experience, and education from existing documents to jumpstart your resume.
+- **Split-Screen Editor**: Real-time side-by-side preview — see your changes as you type.
+- **6 Professional Templates**: Switch instantly between Classic, Modern, Minimal, Creative, Tech, and Executive styles.
+- **Version History**: Automatic snapshot system. Every save creates a restorable version, allowing you to experiment without fear.
+- **PDF Export**: Pixel-perfect PDF generation that preserves complex template layouts.
+- **Cloud Sync**: Securely store and manage your resumes via Supabase integration.
 
 ## 🛠 Tech Stack
 
 ### Frontend
 - **Framework**: React 18 with TypeScript
 - **Bundler**: Vite
-- **Styling**: Tailwind CSS & shadcn/ui
-- **State Management**: React Query (TanStack Query)
+- **Styling**: Vanilla CSS + Tailwind CSS (Custom Design System)
+- **UI Components**: shadcn/ui + Lucide Icons
 - **Animations**: Framer Motion
+- **Services**: Supabase Auth & Storage
 
 ### Backend
 - **Runtime**: Node.js
-- **Framework**: Express.js
+- **Framework**: Express.js (ES Modules)
 - **Language**: TypeScript
-- **Database/Auth**: Supabase
-
-### Infrastructure
-- **Database**: PostgreSQL (via Supabase)
-- **Auth**: Supabase Auth (Email & Google OAuth)
-- **Deployment**: Vercel (Frontend), Supabase Functions (AI Logic)
+- **Parsing**: `pdf-parse` (PDF) & `mammoth` (DOCX)
+- **AI Logic**: Pattern-based NLP optimization for professional terminology.
 
 ## 📁 Project Structure
 
@@ -37,72 +35,66 @@ ResumeForge is a full-stack application designed to help professionals craft sta
 ├── frontend/             # React + Vite application
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── resume/   # Resume specific components
-│   │   │   ├── templates/# Resume template styles
-│   │   │   └── ui/       # Shared UI components (shadcn)
-│   │   ├── pages/        # Application pages
-│   │   ├── hooks/        # Custom React hooks
-│   │   ├── lib/          # Helper libraries & API client
-│   │   └── utils/        # Utility functions
-├── backend/              # Node.js server
-│   ├── routes/           # API endpoints
-│   ├── services/         # Business logic
-│   └── config/           # Server configuration
-└── db/                   # Database schema & migrations
-    ├── schema.sql        # Database schema definition
-    └── migrations/       # SQL migration history
+│   │   │   ├── resume/   # Form & Preview logic
+│   │   │   └── ui/       # Shared design system components
+│   │   ├── pages/        # Auth, Dashboard, and Editor
+│   │   └── lib/          # API Client & Utility functions
+├── backend/              # Express API Server
+│   ├── routes/           # AI, Resumes, Versions, and Import
+│   ├── services/         # Parsing & AI logic
+│   └── index.ts          # Server entry point
+└── db/                   # Database schema definitions
 ```
 
 ## ⚙️ Setup Instructions
 
 ### Prerequisites
 - Node.js (v18+)
-- Supabase Account
+- A Supabase Project (Database + Auth)
 
-### Environment Variables
+### 1. Environment Variables
 
-Create a `.env` file in the `frontend/` directory:
-
+**Frontend (`frontend/.env`):**
 ```env
-VITE_SUPABASE_URL=your_supabase_url
-VITE_SUPABASE_PUBLISHABLE_KEY=your_supabase_anon_key
+VITE_SUPABASE_URL=your_project_url
+VITE_SUPABASE_PUBLISHABLE_KEY=your_anon_key
 VITE_API_URL=http://localhost:3001/api
 ```
 
-### Local Development
+**Backend (`backend/.env`):**
+```env
+PORT=3001
+SUPABASE_URL=your_project_url
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+```
 
-1. **Install Dependencies**:
-   ```bash
-   # Install frontend dependencies
-   cd frontend
-   npm install
+### 2. Installation & Running
 
-   # Install backend dependencies
-   cd ../backend
-   npm install
-   ```
+```bash
+# Clone the repository
+git clone <repo-url>
+cd resumeforge
 
-2. **Run Backend**:
-   ```bash
-   cd backend
-   npm run dev
-   ```
+# Install and run Backend
+cd backend
+npm install
+npm run dev
 
-3. **Run Frontend**:
-   ```bash
-   cd frontend
-   npm run dev
-   ```
+# Install and run Frontend (New Terminal)
+cd ../frontend
+npm install
+npm run dev
+```
 
-## 🗄 Database Schema
+The application will be available at `http://localhost:5173`.
 
-The core database tables include:
-- `profiles`: User information and settings.
-- `resumes`: Main resume data, including title, template, and content JSON.
-- `resume_versions`: Historical snapshots of resume data for the versioning system.
+## 💡 Assumptions Made
 
-Full schema details can be found in `db/schema.sql`.
+1. **Storage**: Resumes are stored as JSON in Supabase. PDF exports are generated client-side using a browser-print based strategy for maximum fidelity.
+2. **AI Processing**: The current AI implementation uses pattern-based optimization in the backend (`aiService.ts`) for speed and reliability. This can be easily swapped for an LLM API (OpenAI/Gemini).
+3. **Database**: Profiles are automatically linked via Supabase Auth metadata.
+4. **Ports**: The system assumes the Backend runs on `3001` and the Frontend on `5173`.
 
 ## 📄 License
 
-MIT
+MIT - Free to use and modify.

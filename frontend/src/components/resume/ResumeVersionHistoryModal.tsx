@@ -22,7 +22,6 @@ export function ResumeVersionHistoryModal({ resumeId, onRestore, onClose }: Prop
   const { user } = useAuth();
   const [versions, setVersions] = useState<Version[]>([]);
   const [loading, setLoading] = useState(true);
-  const [restoring, setRestoring] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -34,22 +33,32 @@ export function ResumeVersionHistoryModal({ resumeId, onRestore, onClose }: Prop
       .catch(() => setLoading(false));
   }, [resumeId, user]);
 
-  const handleRestore = async (version: Version) => {
-    if (!user) return;
-    setRestoring(version.id);
-    try {
-      const response = await api.versions.restore(version.id, user.id);
-      if (response.success && response.data) {
-        onRestore(response.data.data);
-      } else {
-        throw new Error('Restore failed');
-      }
-    } catch (err: any) {
-      console.error(err);
-      // Fallback: local restore if backend fails or doesn't support it yet
-      onRestore(version.data);
+  const getDiffSummary = (current: ResumeData, previous: ResumeData | null) => {
+    if (!previous) return 'Initial version';
+    const changes = [];
+    if (JSON.stringify(current.personal) !== JSON.stringify(previous.personal)) changes.push('Personal Details');
+    if (current.summary !== previous.summary) changes.push('Summary');
+    if (current.education.length !== previous.education.length) {
+      changes.push(`${current.education.length > previous.education.length ? 'Added' : 'Removed'} Education`);
+    } else if (JSON.stringify(current.education) !== JSON.stringify(previous.education)) {
+      changes.push('Updated Education');
     }
-    setRestoring(null);
+    if (current.experience.length !== previous.experience.length) {
+      changes.push(`${current.experience.length > previous.experience.length ? 'Added' : 'Removed'} Work Experience`);
+    } else if (JSON.stringify(current.experience) !== JSON.stringify(previous.experience)) {
+      changes.push('Updated Experience');
+    }
+    if (current.projects.length !== previous.projects.length) {
+      changes.push(`${current.projects.length > previous.projects.length ? 'Added' : 'Removed'} Projects`);
+    } else if (JSON.stringify(current.projects) !== JSON.stringify(previous.projects)) {
+      changes.push('Updated Projects');
+    }
+    if (JSON.stringify(current.skills) !== JSON.stringify(previous.skills)) changes.push('Skills');
+    return changes.length > 0 ? changes.join(', ') : 'Minor tweaks';
+  };
+
+  const handleRestore = (version: Version) => {
+    onRestore(version.data);
   };
 
   return (
@@ -62,9 +71,9 @@ export function ResumeVersionHistoryModal({ resumeId, onRestore, onClose }: Prop
         <div className="flex items-center justify-between px-6 py-4 border-b border-border">
           <div className="flex items-center gap-2">
             <Clock className="h-4 w-4 text-primary" />
-            <h2 className="font-semibold text-foreground">Version History</h2>
+            <h2 className="font-semibold text-foreground whitespace-nowrap">Version History</h2>
           </div>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors">
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors shrink-0">
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -80,34 +89,43 @@ export function ResumeVersionHistoryModal({ resumeId, onRestore, onClose }: Prop
             </div>
           ) : (
             <ul className="space-y-2">
-              {versions.map((v, i) => (
-                <motion.li
-                  key={v.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.04 }}
-                  className="flex items-center justify-between glass-border rounded-lg px-4 py-3 hover:border-primary/20 transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-lg bg-secondary flex items-center justify-center text-xs font-mono text-muted-foreground">
-                      v{versions.length - i}
-                    </div>
-                    <span className="text-sm text-foreground">
-                      {new Date(v.created_at).toLocaleString()}
-                    </span>
-                  </div>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => handleRestore(v)} 
-                    disabled={restoring !== null}
-                    className="text-primary hover:text-primary h-8"
+              {versions.map((v, i) => {
+                const prevVersion = versions[i + 1] || null;
+                const changeSummary = getDiffSummary(v.data, prevVersion?.data);
+                
+                return (
+                  <motion.li
+                    key={v.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.04 }}
+                    className="flex items-center justify-between glass-border rounded-xl px-4 py-4 hover:border-primary/20 transition-all hover:bg-secondary/5 group"
                   >
-                    <RotateCcw className={`h-3.5 w-3.5 mr-1.5 ${restoring === v.id ? 'animate-spin' : ''}`} />
-                    {restoring === v.id ? 'Restoring...' : 'Restore'}
-                  </Button>
-                </motion.li>
-              ))}
+                    <div className="flex items-center gap-4 min-w-0 flex-1">
+                      <div className="h-10 w-10 rounded-xl bg-secondary flex items-center justify-center text-xs font-bold text-muted-foreground shrink-0 border border-border/50 group-hover:border-primary/30 transition-colors">
+                        v{versions.length - i}
+                      </div>
+                      <div className="flex flex-col min-w-0">
+                        <span className="text-xs font-bold text-foreground">
+                          {new Date(v.created_at).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
+                        </span>
+                        <span className="text-[11px] text-muted-foreground truncate italic mt-0.5">
+                          {changeSummary}
+                        </span>
+                      </div>
+                    </div>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => handleRestore(v)} 
+                      className="text-primary hover:bg-primary hover:text-primary-foreground h-9 px-4 rounded-lg min-w-fit whitespace-nowrap shrink-0 ml-4 border border-primary/20 hover:border-primary transition-all"
+                    >
+                      <RotateCcw className="h-3.5 w-3.5 mr-1.5" />
+                      Restore
+                    </Button>
+                  </motion.li>
+                );
+              })}
             </ul>
           )}
         </div>

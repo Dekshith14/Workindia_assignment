@@ -106,43 +106,62 @@ export default function EditorPage() {
   return (
     <div className="flex flex-col h-screen bg-background">
       {/* Toolbar */}
-      <header className="border-b border-border px-4 py-2 flex items-center gap-2 shrink-0 glass">
-        <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard')}>
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
-        <div className="h-6 w-6 rounded-md bg-primary/10 flex items-center justify-center">
-          <FileText className="h-3.5 w-3.5 text-primary" />
+      <header className="border-b border-border px-4 py-2 flex items-center gap-2 shrink-0 glass overflow-x-auto no-scrollbar">
+        <div className="flex items-center gap-2 shrink-0">
+          <Button variant="ghost" size="sm" onClick={() => navigate('/dashboard')} className="shrink-0">
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <div className="h-6 w-6 rounded-md bg-primary/10 flex items-center justify-center shrink-0">
+            <FileText className="h-3.5 w-3.5 text-primary" />
+          </div>
+          <Input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="max-w-[150px] md:max-w-[200px] h-8 text-sm font-medium border-none bg-transparent focus-visible:ring-1 shrink-1"
+          />
         </div>
-        <Input
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="max-w-[200px] h-8 text-sm font-medium border-none bg-transparent focus-visible:ring-1"
-        />
-        <div className="flex-1" />
-        {savedTimestamp && (
-          <span className="text-xs text-muted-foreground animate-save-fade mr-2">{savedTimestamp}</span>
-        )}
-        <Button variant="ghost" size="sm" onClick={() => setShowAI(true)} className="text-accent hover:text-accent">
-          <Sparkles className="mr-1.5 h-4 w-4" />
-          <span className="hidden sm:inline">AI Assist</span>
-        </Button>
-        <Button variant="ghost" size="sm" onClick={() => setShowTemplates(true)}>
-          <Layout className="mr-1.5 h-4 w-4" />
-          <span className="hidden sm:inline">Templates</span>
-        </Button>
-        <Button variant="ghost" size="sm" onClick={() => setShowVersions(true)}>
-          <History className="mr-1.5 h-4 w-4" />
-          <span className="hidden sm:inline">History</span>
-        </Button>
-        <ThemeToggle />
-        <Button variant="ghost" size="sm" onClick={() => downloadResumePdf('resume-preview', title || 'resume')}>
-          <Download className="mr-1.5 h-4 w-4" />
-          <span className="hidden sm:inline">PDF</span>
-        </Button>
-        <Button size="sm" onClick={handleSave} disabled={saving} className="glow-primary">
-          <Save className="mr-1.5 h-4 w-4" />
-          {saving ? 'Saving...' : 'Save'}
-        </Button>
+
+        <div className="flex-1 min-w-[10px]" />
+
+        <div className="flex items-center gap-1.5 shrink-0">
+          {savedTimestamp && (
+            <span className="text-[10px] md:text-xs text-muted-foreground animate-save-fade whitespace-nowrap hidden sm:inline">
+              {savedTimestamp}
+            </span>
+          )}
+          
+          <Button 
+            onClick={() => setShowAI(true)} 
+            className="bg-accent text-accent-foreground hover:bg-accent/90 min-w-fit whitespace-nowrap px-3 md:px-4 shadow-sm transition-all"
+          >
+            <Sparkles className="h-4 w-4 sm:mr-1.5" />
+            <span className="hidden sm:inline">AI Assist</span>
+          </Button>
+          
+          <Button variant="ghost" size="sm" onClick={() => setShowTemplates(true)} className="min-w-fit whitespace-nowrap px-2 md:px-3">
+            <Layout className="h-4 w-4 sm:mr-1.5" />
+            <span className="hidden sm:inline">Templates</span>
+          </Button>
+          
+          <Button variant="ghost" size="sm" onClick={() => setShowVersions(true)} className="min-w-fit whitespace-nowrap px-2 md:px-3">
+            <History className="h-4 w-4 sm:mr-1.5" />
+            <span className="hidden sm:inline">History</span>
+          </Button>
+          
+          <div className="hidden sm:block">
+            <ThemeToggle />
+          </div>
+          
+          <Button variant="ghost" size="sm" onClick={() => downloadResumePdf('resume-preview', title || 'resume')} className="min-w-fit whitespace-nowrap px-2 md:px-3">
+            <Download className="h-4 w-4 sm:mr-1.5" />
+            <span className="hidden sm:inline">PDF</span>
+          </Button>
+          
+          <Button size="sm" onClick={handleSave} disabled={saving} className="glow-primary min-w-fit whitespace-nowrap ml-1 px-3 md:px-4 shadow-md transition-all active:scale-95">
+            <Save className="h-4 w-4 mr-1.5" />
+            <span className="font-medium">{saving ? 'Saving...' : 'Save'}</span>
+          </Button>
+        </div>
       </header>
 
       {/* Mobile toggle */}

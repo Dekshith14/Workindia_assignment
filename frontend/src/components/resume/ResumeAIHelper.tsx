@@ -80,28 +80,32 @@ export function ResumeAIHelper({ data, onChange, onClose }: Props) {
           <div className="space-y-3">
             <Button 
               variant="outline" 
-              className="w-full h-11 glass-border flex items-center justify-between px-4 group hover:border-accent/40 transition-all" 
+              className="w-full h-11 glass-border flex items-center justify-between gap-3 px-4 group hover:border-accent/40 transition-all overflow-hidden" 
               onClick={handleSummary} 
               disabled={loadingSummary || loadingSkills || loadingImprovement !== null}
             >
-              <div className="flex items-center gap-3">
-                <Wand2 className={`h-4 w-4 text-accent ${loadingSummary ? 'animate-spin' : 'group-hover:scale-110 transition-transform'}`} />
-                <span className="text-sm font-medium">Professional Summary</span>
+              <div className="flex items-center gap-3 min-w-0">
+                <Wand2 className={`shrink-0 h-4 w-4 text-accent group-hover:text-accent-foreground ${loadingSummary ? 'animate-spin' : 'group-hover:scale-110 transition-transform'}`} />
+                <span className="text-sm font-medium truncate group-hover:text-accent-foreground">Professional Summary</span>
               </div>
-              {loadingSummary && <span className="text-[10px] uppercase tracking-widest text-accent animate-pulse">Generating</span>}
+              <div className="shrink-0 min-w-fit">
+                {loadingSummary && <span className="text-[10px] uppercase tracking-widest text-accent group-hover:text-accent-foreground animate-pulse whitespace-nowrap">Generating</span>}
+              </div>
             </Button>
             
             <Button 
               variant="outline" 
-              className="w-full h-11 glass-border flex items-center justify-between px-4 group hover:border-primary/40 transition-all" 
+              className="w-full h-11 glass-border flex items-center justify-between gap-3 px-4 group hover:border-primary/40 transition-all overflow-hidden" 
               onClick={handleSkills} 
               disabled={loadingSummary || loadingSkills || loadingImprovement !== null}
             >
-              <div className="flex items-center gap-3">
-                <Lightbulb className={`h-4 w-4 text-primary ${loadingSkills ? 'animate-pulse' : 'group-hover:scale-110 transition-transform'}`} />
-                <span className="text-sm font-medium">Skill Suggestions</span>
+              <div className="flex items-center gap-3 min-w-0">
+                <Lightbulb className={`shrink-0 h-4 w-4 text-primary group-hover:text-primary-foreground ${loadingSkills ? 'animate-pulse' : 'group-hover:scale-110 transition-transform'}`} />
+                <span className="text-sm font-medium truncate group-hover:text-primary-foreground">Skill Suggestions</span>
               </div>
-              {loadingSkills && <span className="text-[10px] uppercase tracking-widest text-primary animate-pulse">Analyzing</span>}
+              <div className="shrink-0 min-w-fit">
+                {loadingSkills && <span className="text-[10px] uppercase tracking-widest text-primary group-hover:text-primary-foreground animate-pulse whitespace-nowrap">Analyzing</span>}
+              </div>
             </Button>
           </div>
 
@@ -113,15 +117,17 @@ export function ResumeAIHelper({ data, onChange, onClose }: Props) {
                   <Button 
                     key={exp.id} 
                     variant="ghost" 
-                    className="w-full h-10 glass-border justify-between px-4 hover:bg-accent/5 transition-all text-left" 
+                    className="w-full h-10 glass-border flex items-center justify-between gap-3 px-4 hover:bg-accent/5 transition-all overflow-hidden" 
                     onClick={() => handleImprove(i)} 
                     disabled={loadingSummary || loadingSkills || loadingImprovement !== null}
                   >
-                    <div className="flex items-center gap-3 overflow-hidden">
+                    <div className="flex items-center gap-3 min-w-0">
                       <Sparkles className={`shrink-0 h-3.5 w-3.5 text-accent ${loadingImprovement === i ? 'animate-pulse' : ''}`} />
                       <span className="text-xs truncate font-medium">{exp.role || `Experience #${i + 1}`}</span>
                     </div>
-                    {loadingImprovement === i && <span className="shrink-0 text-[10px] uppercase text-accent animate-pulse ml-2">Improving</span>}
+                    <div className="shrink-0 min-w-fit">
+                      {loadingImprovement === i && <span className="text-[10px] uppercase text-accent animate-pulse whitespace-nowrap">Improving</span>}
+                    </div>
                   </Button>
                 ))}
               </div>
