@@ -9,8 +9,8 @@ export async function downloadResumePdf(elementId: string, filename: string) {
     margin: 0,
     filename: `${filename}.pdf`,
     image: { type: 'jpeg' as const, quality: 0.98 },
-    html2canvas: { scale: 2, useCORS: true },
-    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' as const },
+    html2canvas: { scale: 2, useCORS: true, scrollY: 0, windowWidth: document.documentElement.offsetWidth },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' as const },
   };
 
   await html2pdf().set(opt).from(element).save();

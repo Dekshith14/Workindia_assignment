@@ -7,79 +7,111 @@ interface Props {
 
 export function ResumePreview({ data, template }: Props) {
   return (
-    <div className="p-6 flex justify-center">
-      <div
-        id="resume-preview"
-        className="w-full max-w-[612px] bg-white text-gray-900 border border-border p-8 font-resume"
-        style={{ minHeight: '792px', color: '#1a1a2e', backgroundColor: '#ffffff' }}
-      >
-        {template === 'classic' && <ClassicTemplate data={data} />}
-        {template === 'modern' && <ModernTemplate data={data} />}
-        {template === 'minimal' && <MinimalTemplate data={data} />}
-        {template === 'creative' && <CreativeTemplate data={data} />}
-        {template === 'tech' && <TechTemplate data={data} />}
-        {template === 'executive' && <ExecutiveTemplate data={data} />}
+    <div className="resume-editor-preview flex justify-center items-start min-h-full">
+      <div className="shadow-2xl">
+        <div
+          id="resume-preview"
+          className="resume-page font-resume text-gray-900"
+        >
+          {template === 'classic' && <ClassicTemplate data={data} />}
+          {template === 'modern' && <ModernTemplate data={data} />}
+          {template === 'minimal' && <MinimalTemplate data={data} />}
+          {template === 'creative' && <CreativeTemplate data={data} />}
+          {template === 'tech' && <TechTemplate data={data} />}
+          {template === 'executive' && <ExecutiveTemplate data={data} />}
+        </div>
       </div>
     </div>
   );
 }
 
-/* ─── CLASSIC ───────────────────────────── */
 function ClassicTemplate({ data }: { data: ResumeData }) {
   const { personal } = data;
   return (
     <div style={{ fontFamily: "'Playfair Display', Georgia, serif" }}>
-      <header style={{ textAlign: 'center', borderBottom: '2px solid #1a1a2e', paddingBottom: '16px', marginBottom: '20px' }}>
-        <h1 style={{ fontSize: '26px', fontWeight: 700, margin: 0 }}>{personal.name || 'Your Name'}</h1>
-        <p style={{ fontSize: '11px', color: '#666', marginTop: '6px' }}>
+      <header className="resume-header">
+        <h1 className="resume-name">{personal.name || 'Your Name'}</h1>
+        <p className="resume-contact mt-2">
           {[personal.email, personal.phone, personal.location].filter(Boolean).join(' · ')}
         </p>
         {(personal.linkedin || personal.portfolio) && (
-          <p style={{ fontSize: '11px', color: '#666' }}>
+          <p className="resume-contact mt-1">
             {[personal.linkedin, personal.portfolio].filter(Boolean).join(' · ')}
           </p>
         )}
       </header>
-      {data.summary && <SectionBlock title="Summary"><p style={{ fontSize: '13px', lineHeight: 1.7 }}>{data.summary}</p></SectionBlock>}
-      {data.experience.length > 0 && (
-        <SectionBlock title="Experience">
-          {data.experience.map(exp => (
-            <div key={exp.id} style={{ marginBottom: '14px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                <span style={{ fontWeight: 600, fontSize: '14px' }}>{exp.role}</span>
-                <span style={{ fontSize: '11px', color: '#888' }}>{exp.duration}</span>
+      
+      {data.summary && (
+        <div style={{ marginBottom: '24px' }}>
+          <p style={{ fontSize: '14px', lineHeight: 1.6 }}>{data.summary}</p>
+        </div>
+      )}
+
+      <div className="resume-grid">
+        <div className="left-col">
+          {data.experience.length > 0 && (
+            <ClassicSectionBlock title="Experience">
+              {data.experience.map(exp => (
+                <div key={exp.id} style={{ marginBottom: '16px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                    <span style={{ fontWeight: 600, fontSize: '15px', color: '#0f172a' }}>{exp.role}</span>
+                    <span style={{ fontSize: '12px', color: '#64748b' }}>{exp.duration}</span>
+                  </div>
+                  <p style={{ fontSize: '13px', color: '#475569', fontWeight: 500 }}>{exp.company}</p>
+                  <p style={{ fontSize: '13px', lineHeight: 1.6, marginTop: '6px', color: '#334155' }}>{exp.description}</p>
+                </div>
+              ))}
+            </ClassicSectionBlock>
+          )}
+
+          {data.projects.length > 0 && (
+            <ClassicSectionBlock title="Projects">
+              {data.projects.map(proj => (
+                <div key={proj.id} style={{ marginBottom: '16px' }}>
+                  <span style={{ fontWeight: 600, fontSize: '15px', color: '#0f172a' }}>{proj.name}</span>
+                  <p style={{ fontSize: '13px', lineHeight: 1.6, marginTop: '4px', color: '#334155' }}>{proj.description}</p>
+                  {proj.technologies && <p style={{ fontSize: '12px', color: '#64748b', marginTop: '4px' }}>{proj.technologies}</p>}
+                </div>
+              ))}
+            </ClassicSectionBlock>
+          )}
+        </div>
+
+        <div className="right-col">
+          {data.education.length > 0 && (
+            <ClassicSectionBlock title="Education">
+              {data.education.map(edu => (
+                <div key={edu.id} style={{ marginBottom: '16px' }}>
+                  <span style={{ fontWeight: 600, fontSize: '14px', display: 'block', color: '#0f172a' }}>{edu.degree}</span>
+                  <p style={{ fontSize: '13px', color: '#475569' }}>{edu.institution}</p>
+                  <p style={{ fontSize: '12px', color: '#64748b' }}>{edu.year}</p>
+                </div>
+              ))}
+            </ClassicSectionBlock>
+          )}
+
+          {data.skills.length > 0 && (
+            <ClassicSectionBlock title="Skills">
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                {data.skills.map(s => (
+                  <span key={s} style={{ fontSize: '12px', padding: '4px 10px', background: '#f1f5f9', borderRadius: '4px', color: '#334155', fontWeight: 500 }}>
+                    {s}
+                  </span>
+                ))}
               </div>
-              <p style={{ fontSize: '12px', color: '#888', fontStyle: 'italic' }}>{exp.company}</p>
-              <p style={{ fontSize: '13px', lineHeight: 1.7, marginTop: '4px' }}>{exp.description}</p>
-            </div>
-          ))}
-        </SectionBlock>
-      )}
-      {data.education.length > 0 && (
-        <SectionBlock title="Education">
-          {data.education.map(edu => (
-            <div key={edu.id} style={{ marginBottom: '8px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ fontWeight: 600, fontSize: '14px' }}>{edu.degree}</span>
-                <span style={{ fontSize: '11px', color: '#888' }}>{edu.year}</span>
-              </div>
-              <p style={{ fontSize: '12px', color: '#888' }}>{edu.institution}</p>
-            </div>
-          ))}
-        </SectionBlock>
-      )}
-      {data.projects.length > 0 && (
-        <SectionBlock title="Projects">
-          {data.projects.map(proj => (
-            <div key={proj.id} style={{ marginBottom: '10px' }}>
-              <span style={{ fontWeight: 600, fontSize: '14px' }}>{proj.name}</span>
-              <p style={{ fontSize: '13px', lineHeight: 1.7 }}>{proj.description}</p>
-              {proj.technologies && <p style={{ fontSize: '11px', color: '#888', marginTop: '2px' }}>{proj.technologies}</p>}
-            </div>
-          ))}
-        </SectionBlock>
-      )}
-      {data.skills.length > 0 && <SectionBlock title="Skills"><p style={{ fontSize: '13px' }}>{data.skills.join(', ')}</p></SectionBlock>}
+            </ClassicSectionBlock>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ClassicSectionBlock({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div style={{ marginBottom: '24px' }}>
+      <h2 style={{ fontSize: '15px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', color: '#0f172a', borderBottom: '2px solid #e2e8f0', paddingBottom: '6px', marginBottom: '16px' }}>{title}</h2>
+      {children}
     </div>
   );
 }

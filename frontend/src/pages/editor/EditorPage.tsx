@@ -12,6 +12,7 @@ import { ResumeAIHelper } from '@/components/resume/ResumeAIHelper';
 import { downloadResumePdf } from '@/lib/pdf';
 import { api } from '@/lib/api-client';
 import { Button } from '@/components/ui/button';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { Input } from '@/components/ui/input';
 import { ArrowLeft, Download, Save, History, Layout, Sparkles, Eye, PenLine, FileText } from 'lucide-react';
 import { toast } from 'sonner';
@@ -36,13 +37,8 @@ export default function EditorPage() {
 
   useEffect(() => {
     if (!id || !user) return;
-    supabase
-      .from('resumes')
-      .select('*')
-      .eq('id', id)
-      .eq('user_id', user.id)
-      .single()
-      .then(({ data: r }) => {
+    api.resumes.get(id, user.id)
+      .then((r) => {
         if (r) {
           const rec = r as unknown as ResumeRecord;
           setResume(rec);
@@ -51,6 +47,9 @@ export default function EditorPage() {
           setTemplate(rec.template);
           setIsPaidUnlocked(rec.is_paid_template_unlocked);
         }
+      })
+      .catch((error) => {
+        toast.error('Failed to load resume');
       });
   }, [id, user]);
 
@@ -78,12 +77,12 @@ export default function EditorPage() {
   const handleTemplateChange = async (t: TemplateId) => {
     if (t === 'executive' && !isPaidUnlocked) return;
     setTemplate(t);
-    if (id) await supabase.from('resumes').update({ template: t }).eq('id', id);
+    if (id && user) await api.resumes.update(id, { template: t }, user.id);
   };
 
   const handleUnlockPaid = async () => {
     setIsPaidUnlocked(true);
-    if (id) await supabase.from('resumes').update({ is_paid_template_unlocked: true }).eq('id', id);
+    if (id && user) await api.resumes.update(id, { is_paid_template_unlocked: true }, user.id);
     toast.success('Executive template unlocked!');
   };
 
@@ -135,6 +134,7 @@ export default function EditorPage() {
           <History className="mr-1.5 h-4 w-4" />
           <span className="hidden sm:inline">History</span>
         </Button>
+        <ThemeToggle />
         <Button variant="ghost" size="sm" onClick={() => downloadResumePdf('resume-preview', title || 'resume')}>
           <Download className="mr-1.5 h-4 w-4" />
           <span className="hidden sm:inline">PDF</span>

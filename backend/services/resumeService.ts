@@ -27,7 +27,7 @@ export const resumeService = {
   async createResume(userId: string, title: string, template: string, data: any) {
     const { data: result, error } = await supabase
       .from('resumes')
-      .insert([{ user_id: userId, title, template, data: JSON.parse(JSON.stringify(data)) }])
+      .insert([{ user_id: userId, title, template, data }])
       .select()
       .single();
     
@@ -36,15 +36,20 @@ export const resumeService = {
   },
 
   async updateResume(id: string, userId: string, updates: any) {
+    // Ensure data is properly serialized if it exists
+    const cleanUpdates = { ...updates };
+    // Assume data is already correct from the client
+
     const { data: result, error } = await supabase
       .from('resumes')
-      .update(updates)
+      .update(cleanUpdates)
       .eq('id', id)
       .eq('user_id', userId)
       .select()
-      .single();
+      .maybeSingle(); // Safer than single if update might match 0 rows
     
     if (error) throw error;
+    if (!result) throw new Error('Resume not found or unauthorized');
     return result;
   },
 

@@ -22,6 +22,7 @@ export function ResumeVersionHistoryModal({ resumeId, onRestore, onClose }: Prop
   const { user } = useAuth();
   const [versions, setVersions] = useState<Version[]>([]);
   const [loading, setLoading] = useState(true);
+  const [restoring, setRestoring] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -32,6 +33,24 @@ export function ResumeVersionHistoryModal({ resumeId, onRestore, onClose }: Prop
       })
       .catch(() => setLoading(false));
   }, [resumeId, user]);
+
+  const handleRestore = async (version: Version) => {
+    if (!user) return;
+    setRestoring(version.id);
+    try {
+      const response = await api.versions.restore(version.id, user.id);
+      if (response.success && response.data) {
+        onRestore(response.data.data);
+      } else {
+        throw new Error('Restore failed');
+      }
+    } catch (err: any) {
+      console.error(err);
+      // Fallback: local restore if backend fails or doesn't support it yet
+      onRestore(version.data);
+    }
+    setRestoring(null);
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/60 backdrop-blur-sm">
@@ -77,9 +96,15 @@ export function ResumeVersionHistoryModal({ resumeId, onRestore, onClose }: Prop
                       {new Date(v.created_at).toLocaleString()}
                     </span>
                   </div>
-                  <Button variant="ghost" size="sm" onClick={() => onRestore(v.data)} className="text-primary hover:text-primary">
-                    <RotateCcw className="h-3.5 w-3.5 mr-1" />
-                    Restore
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => handleRestore(v)} 
+                    disabled={restoring !== null}
+                    className="text-primary hover:text-primary h-8"
+                  >
+                    <RotateCcw className={`h-3.5 w-3.5 mr-1.5 ${restoring === v.id ? 'animate-spin' : ''}`} />
+                    {restoring === v.id ? 'Restoring...' : 'Restore'}
                   </Button>
                 </motion.li>
               ))}

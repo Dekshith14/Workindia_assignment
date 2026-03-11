@@ -1,11 +1,19 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { api } from '@/lib/api-client';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import type { ResumeRecord, ResumeData } from '@/lib/resume-types';
 import { emptyResumeData } from '@/lib/resume-types';
-import { Plus, FileText, LogOut, Upload, MoreVertical, Trash2, Clock } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Plus, FileText, LogOut, Upload, ChevronDown, Trash2, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 
@@ -18,57 +26,62 @@ export default function ResumeDashboard() {
 
   useEffect(() => {
     if (!user) return;
-    supabase
-      .from('resumes')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('updated_at', { ascending: false })
-      .then(({ data }) => {
-        setResumes((data as unknown as ResumeRecord[]) || []);
+    api.resumes.list(user.id)
+      .then((data) => {
+        setResumes(data || []);
+        setLoading(false);
+      })
+      .catch((error) => {
+        toast.error('Failed to load resumes');
         setLoading(false);
       });
   }, [user]);
 
   const createResume = async () => {
     if (!user) return;
-    const { data, error } = await supabase
-      .from('resumes')
-      .insert([{ user_id: user.id, title: 'Untitled Resume', template: 'classic', data: JSON.parse(JSON.stringify(emptyResumeData)) }])
-      .select()
-      .single();
-    if (!error && data) navigate(`/editor/${data.id}`);
+    try {
+      const data = await api.resumes.create({ title: 'Untitled Resume', template: 'classic', data: emptyResumeData }, user.id);
+      navigate(`/editor/${data.id}`);
+    } catch (error) {
+      toast.error('Failed to create resume');
+    }
   };
 
   const deleteResume = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    await supabase.from('resumes').delete().eq('id', id);
-    setResumes(r => r.filter(x => x.id !== id));
-    toast.success('Resume deleted');
+    try {
+      await api.resumes.delete(id, user.id);
+      setResumes(r => r.filter(x => x.id !== id));
+      toast.success('Resume deleted');
+    } catch (error) {
+      toast.error('Failed to delete resume');
+    }
   };
 
   const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !user) return;
+    
+    setLoading(true);
     try {
-      const text = await file.text();
-      const parsed = JSON.parse(text) as ResumeData;
-      // Basic validation
-      if (!parsed.personal || !Array.isArray(parsed.skills)) {
-        toast.error('Invalid resume JSON format');
-        return;
+      const result = await api.resumes.import(file, user.id);
+      if (result && result.data) {
+        const created = await api.resumes.create({ 
+          title: result.data.personal?.name || result.title || 'Imported Resume', 
+          template: 'classic', 
+          data: result.data 
+        }, user.id);
+        
+        if (created) {
+          toast.success('Resume imported successfully!');
+          navigate(`/editor/${created.id}`);
+        }
       }
-      const { data, error } = await supabase
-        .from('resumes')
-        .insert([{ user_id: user.id, title: parsed.personal.name || 'Imported Resume', template: 'classic', data: JSON.parse(JSON.stringify(parsed)) }])
-        .select()
-        .single();
-      if (!error && data) {
-        toast.success('Resume imported!');
-        navigate(`/editor/${data.id}`);
-      }
-    } catch {
-      toast.error('Failed to parse JSON file');
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to import resume');
+      setLoading(false);
     }
+    
     if (fileRef.current) fileRef.current.value = '';
   };
 
@@ -93,15 +106,29 @@ export default function ResumeDashboard() {
           <span className="text-lg font-bold text-foreground tracking-tight">ResumeForge</span>
         </div>
         <div className="flex items-center gap-2">
-          <input ref={fileRef} type="file" accept=".json" className="hidden" onChange={handleImport} />
-          <Button variant="ghost" size="sm" onClick={() => fileRef.current?.click()}>
-            <Upload className="mr-1.5 h-4 w-4" />
-            Import JSON
-          </Button>
+          <input ref={fileRef} type="file" accept=".pdf,.docx" className="hidden" onChange={handleImport} />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="hidden sm:flex">
+                <Upload className="mr-1.5 h-4 w-4" />
+                Import Resume
+                <ChevronDown className="ml-1.5 h-3 w-3 opacity-50" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem onClick={() => { if (fileRef.current) { fileRef.current.accept = '.pdf'; fileRef.current.click(); } }}>
+                Upload PDF
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => { if (fileRef.current) { fileRef.current.accept = '.docx'; fileRef.current.click(); } }}>
+                Upload Word (.docx)
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           <Button onClick={createResume} size="sm" className="glow-primary">
             <Plus className="mr-1.5 h-4 w-4" />
             New Resume
           </Button>
+          <ThemeToggle />
           <Button variant="ghost" size="icon" onClick={() => signOut()} className="text-muted-foreground hover:text-foreground">
             <LogOut className="h-4 w-4" />
           </Button>
@@ -135,10 +162,23 @@ export default function ResumeDashboard() {
                 <Plus className="mr-1.5 h-4 w-4" />
                 Create your first resume
               </Button>
-              <Button variant="outline" onClick={() => fileRef.current?.click()}>
-                <Upload className="mr-1.5 h-4 w-4" />
-                Import JSON
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline">
+                    <Upload className="mr-1.5 h-4 w-4" />
+                    Import Resume
+                    <ChevronDown className="ml-1.5 h-3 w-3 opacity-50" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="center" className="w-48">
+                  <DropdownMenuItem onClick={() => { if (fileRef.current) { fileRef.current.accept = '.pdf'; fileRef.current.click(); } }}>
+                    Upload PDF
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => { if (fileRef.current) { fileRef.current.accept = '.docx'; fileRef.current.click(); } }}>
+                    Upload Word (.docx)
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </motion.div>
         ) : (

@@ -9,7 +9,7 @@ import { motion } from 'framer-motion';
 import { FileText } from 'lucide-react';
 
 export default function AuthPage() {
-  const { signIn, signUp, user } = useAuth();
+  const { signIn, signUp, signInWithGoogle, user } = useAuth();
   const navigate = useNavigate();
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
@@ -41,13 +41,12 @@ export default function AuthPage() {
   };
 
   const handleGoogleSignIn = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: window.location.origin,
-      },
-    });
-    if (error) setError(error.message);
+    try {
+      const { error } = await signInWithGoogle();
+      if (error) setError(error.message);
+    } catch (err: any) {
+      setError(err.message || 'An error occurred during Google sign in');
+    }
   };
 
   return (

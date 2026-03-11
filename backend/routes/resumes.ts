@@ -12,7 +12,7 @@ router.get('/', async (req, res) => {
     const resumes = await resumeService.getResumes(userId);
     res.json(resumes);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
@@ -22,7 +22,7 @@ router.get('/:id', async (req, res) => {
     const resume = await resumeService.getResumeById(req.params.id, userId);
     res.json(resume);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
@@ -33,7 +33,7 @@ router.post('/', async (req, res) => {
     const result = await resumeService.createResume(userId, title, template, data);
     res.status(201).json(result);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
@@ -43,7 +43,7 @@ router.put('/:id', async (req, res) => {
     const result = await resumeService.updateResume(req.params.id, userId, req.body);
     res.json(result);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
@@ -53,7 +53,7 @@ router.delete('/:id', async (req, res) => {
     const result = await resumeService.deleteResume(req.params.id, userId);
     res.json(result);
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 

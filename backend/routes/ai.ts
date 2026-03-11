@@ -9,7 +9,7 @@ router.post('/summary', async (req, res) => {
     const result = await aiService.generateSummary(jobTitle, experience);
     res.json({ result });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
@@ -19,7 +19,7 @@ router.post('/improve', async (req, res) => {
     const result = await aiService.improveExperience(description);
     res.json({ result });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
@@ -29,7 +29,7 @@ router.post('/skills', async (req, res) => {
     const result = await aiService.suggestSkills(jobTitle);
     res.json({ result });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 

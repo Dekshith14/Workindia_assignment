@@ -1,0 +1,20 @@
+Type of pdf: object
+Keys of pdf: [
+  'AbortException',
+  'FormatError',
+  'InvalidPDFException',
+  'Line',
+  'LineDirection',
+  'LineStore',
+  'PDFParse',
+  'PasswordException',
+  'Point',
+  'Rectangle',
+  'ResponseException',
+  'Shape',
+  'Table',
+  'UnknownErrorException',
+  'VerbosityLevel',
+  'getException'
+]
+pdf() failed: pdf is not a function

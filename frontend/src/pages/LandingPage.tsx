@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
+import { ThemeToggle } from '@/components/ui/ThemeToggle';
 import { motion } from 'framer-motion';
 import { FileText, Sparkles, Download, History, Layout, ArrowRight, Zap, Shield, Star } from 'lucide-react';
 
@@ -43,10 +44,13 @@ export default function LandingPage() {
           </div>
           <span className="text-lg font-bold text-foreground tracking-tight">ResumeForge</span>
         </div>
-        <Button onClick={handleGetStarted} size="sm" className="glow-primary">
-          {user ? 'Dashboard' : 'Get Started'}
-          <ArrowRight className="ml-1 h-4 w-4" />
-        </Button>
+        <div className="flex items-center gap-4">
+          <ThemeToggle />
+          <Button onClick={handleGetStarted} size="sm" className="glow-primary">
+            {user ? 'Dashboard' : 'Get Started'}
+            <ArrowRight className="ml-1 h-4 w-4" />
+          </Button>
+        </div>
       </nav>
 
       {/* Hero */}

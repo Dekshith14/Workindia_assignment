@@ -1,0 +1,19 @@
+DEKSHITH M
+Bangalore - 560043 | +91 6309265756 | dekshith.m4a4@gmail.com | LinkedIn | GitHub
+
+SUMMARY
+Computer Science undergraduate with a strong foundation in backend development, system design, and data-driven applications. Experienced in building scalable APIs, serverless platforms, and real-time systems.
+
+SKILLS
+Python, C, Rust, Backend & Systems, REST APIs, GraphQL, Node.js, SQL, Git, Docker
+
+EXPERIENCE
+Software Engineering Intern at ABC Corp
+Worked on backend APIs using Node.js and PostgreSQL. Built REST endpoints and improved performance by 30%.
+
+EDUCATION
+B.Tech Computer Science - XYZ University - 2025
+
+PROJECTS
+Resume Builder App
+Built a full-stack resume builder using React and Node.js with PDF export and AI suggestions.
