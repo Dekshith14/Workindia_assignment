@@ -10,6 +10,9 @@ ResumeForge is a full-stack application designed to help professionals craft sta
 
 ## 📸 Screenshots
 
+### Landing Page
+![Landing Page](docs/screenshots/landing.png)
+
 ### Dashboard
 ![Dashboard](docs/screenshots/dashboard.png)
 
