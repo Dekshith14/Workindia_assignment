@@ -1,347 +1,100 @@
-ResumeForge – AI-Powered Resume Builder
-
-
-
-
-
-
-
-
-ResumeForge is a full-stack AI-powered resume builder designed to help professionals quickly create polished, ATS-friendly resumes using modern templates, intelligent suggestions, and real-time editing.
-
-The application provides a structured editing experience, cloud persistence, version history tracking, and resume import capabilities.
-
-🚀 Features
-Resume Creation
-
-Create and edit resumes through a structured editor.
-
-Real-time split-screen preview while editing.
-
-Cloud persistence with Supabase.
-
-Professional Templates
-
-Switch instantly between 6 professionally designed templates:
-
-Classic
-
-Modern
-
-Minimal
-
-Creative
-
-Tech
-
-Executive
-
-Each template uses the same structured data model but renders different layouts.
-
-AI Assistance
-
-AI tools help improve resume quality by:
-
-Generating professional summaries
-
-Improving experience bullet points
-
-Suggesting relevant skills
-
-The backend processes resume content using pattern-based NLP logic optimized for professional language.
-
-Resume Import
-
-Users can upload an existing resume to automatically populate the editor.
-
-Supported formats:
-
-PDF
-
-DOCX
-
-The backend extracts text and maps it into editable resume sections.
-
-Version History
-
-Every save creates a resume snapshot stored in the database.
-
-Users can:
-
-view previous versions
-
-restore earlier versions
-
-experiment without losing work
-
-PDF Export
-
-Resumes can be exported as pixel-perfect PDFs while preserving template layout and typography.
-
-Authentication
-
-Secure login powered by Supabase.
-
-Supported methods:
-
-Email authentication
-
-Google OAuth login
-
-📸 Screenshots
-
-(Add screenshots to docs/screenshots folder and update paths)
-
-Dashboard
-
-Resume Editor
-
-Template Selection
-
-AI Assistance
-
-🧩 System Architecture
-
-The application follows a three-layer architecture.
-
-User Browser
-     ↓
-React Frontend (Vite)
-     ↓
-Express Backend API
-     ↓
-Supabase (PostgreSQL + Auth)
-Frontend Responsibilities
-
-Resume editor interface
-
-Template rendering
-
-AI interaction UI
-
-Resume preview
-
-PDF export
-
-File uploads
-
-Backend Responsibilities
-
-Resume CRUD operations
-
-Version history management
-
-Resume import parsing
-
-AI text processing
-
-Secure communication with Supabase
-
-Database Responsibilities
-
-Authentication
-
-Resume storage
-
-Version snapshot storage
-
-🛠 Tech Stack
-Frontend
-
-React 18
-
-TypeScript
-
-Vite
-
-Tailwind CSS
-
-shadcn/ui
-
-Framer Motion
-
-Lucide Icons
-
-Supabase Auth Client
-
-Backend
-
-Node.js
-
-Express.js
-
-TypeScript
-
-Multer (file uploads)
-
-pdf-parse (PDF parsing)
-
-Mammoth (DOCX parsing)
-
-Database
-
-Supabase
-
-PostgreSQL
-
-Row Level Security (RLS)
-
-Supabase Authentication
-
-📁 Project Structure
-ResumeForge
-│
+# ResumeForge – Professional AI Resume Builder
+
+ResumeForge is a full-stack application designed to help professionals craft standout resumes with ease. Version 2.0 features a premium design system, AI-powered suggestions, real-time preview, and multiple professional templates.
+
+## 🚀 Features
+
+- **AI-Powered Assistance**: Generate professional summaries, improve experience bullet points with action-verbs, and get skill suggestions based on your target role.
+- **Resume Import (PDF/DOCX)**: Intelligent parser that extracts personal info, experience, and education from existing documents to jumpstart your resume.
+- **Split-Screen Editor**: Real-time side-by-side preview — see your changes as you type.
+- **6 Professional Templates**: Switch instantly between Classic, Modern, Minimal, Creative, Tech, and Executive styles.
+- **Version History**: Automatic snapshot system. Every save creates a restorable version, allowing you to experiment without fear.
+- **PDF Export**: Pixel-perfect PDF generation that preserves complex template layouts.
+- **Cloud Sync**: Securely store and manage your resumes via Supabase integration.
+
+## 🛠 Tech Stack
+
+### Frontend
+- **Framework**: React 18 with TypeScript
+- **Bundler**: Vite
+- **Styling**: Vanilla CSS + Tailwind CSS (Custom Design System)
+- **UI Components**: shadcn/ui + Lucide Icons
+- **Animations**: Framer Motion
+- **Services**: Supabase Auth & Storage
+
+### Backend
+- **Runtime**: Node.js
+- **Framework**: Express.js (ES Modules)
+- **Language**: TypeScript
+- **Parsing**: `pdf-parse` (PDF) & `mammoth` (DOCX)
+- **AI Logic**: Pattern-based NLP optimization for professional terminology.
+
+## 📁 Project Structure
+
+```text
 ├── frontend/             # React + Vite application
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── resume/
-│   │   │   └── ui/
-│   │   ├── pages/
-│   │   │   ├── auth/
-│   │   │   ├── dashboard/
-│   │   │   └── editor/
-│   │   ├── hooks/
-│   │   └── lib/
-│
-├── backend/              # Express API server
-│   ├── routes/
-│   │   ├── resumes
-│   │   ├── versions
-│   │   ├── ai
-│   │   └── import
-│   ├── services/
-│   │   ├── resumeService
-│   │   ├── aiService
-│   │   └── importService
-│   └── index.ts
-│
-└── db/
-    └── schema.sql
-🗄 Database Schema
+│   │   │   ├── resume/   # Form & Preview logic
+│   │   │   └── ui/       # Shared design system components
+│   │   ├── pages/        # Auth, Dashboard, and Editor
+│   │   └── lib/          # API Client & Utility functions
+├── backend/              # Express API Server
+│   ├── routes/           # AI, Resumes, Versions, and Import
+│   ├── services/         # Parsing & AI logic
+│   └── index.ts          # Server entry point
+└── db/                   # Database schema definitions
+```
 
-The database structure follows this relationship:
+## ⚙️ Setup Instructions
 
-auth.users
-     ↓
-profiles
-     ↓
-resumes
-     ↓
-resume_versions
-profiles
+### Prerequisites
+- Node.js (v18+)
+- A Supabase Project (Database + Auth)
 
-Stores metadata for authenticated users.
+### 1. Environment Variables
 
-resumes
-
-Stores the current editable resume.
-
-resume_versions
-
-Stores historical snapshots for version restoration.
-
-🔌 API Endpoints
-Resume Management
-POST   /api/resumes
-GET    /api/resumes
-PUT    /api/resumes/:id
-DELETE /api/resumes/:id
-Version History
-GET  /api/versions/:resumeId
-POST /api/versions
-POST /api/versions/restore
-AI Assistance
-POST /api/ai/summary
-POST /api/ai/improve
-POST /api/ai/skills
-Resume Import
-POST /api/import-resume
-
-Accepts:
-
-PDF
-
-DOCX
-
-⚙️ Setup Instructions
-Prerequisites
-
-Node.js v18+
-
-Supabase project
-
-Environment Variables
-Frontend (frontend/.env)
+**Frontend (`frontend/.env`):**
+```env
 VITE_SUPABASE_URL=your_project_url
-VITE_SUPABASE_ANON_KEY=your_anon_key
+VITE_SUPABASE_PUBLISHABLE_KEY=your_anon_key
 VITE_API_URL=http://localhost:3001/api
-Backend (backend/.env)
+```
+
+**Backend (`backend/.env`):**
+```env
 PORT=3001
 SUPABASE_URL=your_project_url
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-Installation
+```
 
-Clone the repository:
+### 2. Installation & Running
 
+```bash
+# Clone the repository
 git clone <repo-url>
 cd resumeforge
 
-Start backend:
-
+# Install and run Backend
 cd backend
 npm install
 npm run dev
 
-Start frontend:
-
+# Install and run Frontend (New Terminal)
 cd ../frontend
 npm install
 npm run dev
+```
 
-Application runs at:
+The application will be available at `http://localhost:5173`.
 
-http://localhost:5173
-💡 Assumptions
+## 💡 Assumptions Made
 
-Resumes are stored as structured JSON to allow template switching without data loss.
+1. **Storage**: Resumes are stored as JSON in Supabase. PDF exports are generated client-side using a browser-print based strategy for maximum fidelity.
+2. **AI Processing**: The current AI implementation uses pattern-based optimization in the backend (`aiService.ts`) for speed and reliability. This can be easily swapped for an LLM API (OpenAI/Gemini).
+3. **Database**: Profiles are automatically linked via Supabase Auth metadata.
+4. **Ports**: The system assumes the Backend runs on `3001` and the Frontend on `5173`.
 
-AI suggestions use rule-based processing but can be extended to LLM APIs.
+## 📄 License
 
-Version history stores snapshots instead of diffs for simplicity.
-
-PDF export is handled client-side to preserve template styling.
-
-🚀 Future Improvements
-
-Potential enhancements:
-
-LinkedIn profile import
-
-AI job description matching
-
-ATS compatibility scoring
-
-Collaborative resume editing
-
-Resume analytics and feedback
-
-📄 License
-
-MIT License
-Free to use and modify.
-
-👍 What This README Achieves
-
-Your repo now clearly demonstrates:
-
-system architecture
-
-database design
-
-API design
-
-AI integration
-
-product thinking
-
-Which are exactly the things reviewers evaluate in technical assignments.
+MIT - Free to use and modify.
